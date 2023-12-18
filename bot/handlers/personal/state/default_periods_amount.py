@@ -1,0 +1,62 @@
+from aiogram import Router, types
+from aiogram.fsm.context import FSMContext
+
+from bot.states.states import Default
+from loader import dp, executor
+
+router = Router()
+dp.include_router(router)
+
+
+@router.message(Default.periods_amount)
+async def change_periods_amount_state(message: types.Message, state: FSMContext) -> None:
+    """
+    Reacts at information default data setting (periods amount)
+
+    '''
+    Are you sure?
+    ┌-----------------┐
+    |       Yes       |
+    └-----------------┘
+    ┌-----------------┐
+    |        No       |
+    └-----------------┘
+    '''
+    """
+    user_id = message.from_user.id
+    await executor.remember_message(user_id=user_id, message_id=message.message_id)
+
+    try:
+        periods_amount = int(message.text)
+        if periods_amount < 0:
+            raise ValueError
+        state_data = await state.update_data(periods_amount=periods_amount)
+        await state.clear()
+
+        buttons = [
+            [
+                types.InlineKeyboardButton(
+                    text=f"ㅤ ✅ Так, все правильно!ㅤㅤ",
+                    callback_data=f"create_default_{state_data['cycle_duration']}_{periods_amount}",
+                ),
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text=f"ㅤ❌ Ні, дещо неправильно!",
+                    callback_data=f"create_wrong_default",
+                ),
+            ],
+        ]
+
+        keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+
+        text = f"Введено: Цикл {state_data['cycle_duration']}, Місячні {periods_amount}"
+
+        answer = await message.answer(text=text, reply_markup=keyboard)
+        await executor.remember_message(user_id=user_id, message_id=answer.message_id)
+    except ValueError:
+        await executor.registration_period(
+            user_id=user_id,
+            apendix="Ти встановлюєш постійне значення!\nОтримані дані не є цифрами!\n",
+            change=True,
+        )
