@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
+from apscheduler.jobstores.base import JobLookupError
 
 from bot.keyboards.inline.about_keyboard import about_keyboard
 from bot.keyboards.inline.calendar_keyboard import calendar_keyboard
@@ -38,7 +39,11 @@ async def create_callback(callback: types.CallbackQuery, state: FSMContext) -> N
             await state.set_state(Default.cycle_duration)
             await executor.registration_cycle(
                 user_id=user_id,
-                apendix="Ти встановлюєш постійне значення!\nДавай спробуємо ще раз!\n",
+                apendix=(
+                    "Ти встановлюєш постійне значення!\n"
+                    "Для того, щоб видалити постійне значення - введи 0.\n"
+                    "Давай спробуємо ще раз!\n"
+                ),
                 change=True,
             )
         else:  # Registration
@@ -53,8 +58,10 @@ async def create_callback(callback: types.CallbackQuery, state: FSMContext) -> N
         )
         executor.session.commit()
 
-        del executor.all_users[user_id]
-        scheduler.remove_job(job_id=str(user_id))
+        try:
+            scheduler.remove_job(job_id=str(user_id))
+        except JobLookupError:
+            pass
 
         await executor.message_delete(user_id=user_id)
         await callback.answer(text="Інформація видалена!")
@@ -86,7 +93,6 @@ async def create_callback(callback: types.CallbackQuery, state: FSMContext) -> N
                 break
             executor.session.commit()
 
-        await executor.remember_user(user=new_user)
         await executor.message_delete(user_id=user_id)
         answer = await callback.message.answer(
             text="Тепер кожен день ви будете отримувати наступне повідомлення!"
@@ -105,7 +111,6 @@ async def create_callback(callback: types.CallbackQuery, state: FSMContext) -> N
         user_for_update.cycle_amount = 1
         executor.session.commit()
 
-        await executor.remember_user(user=user_for_update)
         await executor.message_delete(user_id=user_id)
         await about_keyboard(user_id=user_id, today=date)
         return callback.answer(text="Операція зміни профілю успішна!")
@@ -116,7 +121,6 @@ async def create_callback(callback: types.CallbackQuery, state: FSMContext) -> N
         user_for_update.default_periods_amount = int(data[3])
         executor.session.commit()
 
-        await executor.remember_user(user=user_for_update)
         await executor.message_delete(user_id=user_id)
         await about_keyboard(user_id=user_id, today=date)
         return callback.answer(text="Операція встановлення постійних значень успішна!")

@@ -32,6 +32,15 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+
+async def get_session():
+    return session
+
+
+async def close_session():
+    return session.close()
+
+
 # Creating bot
 bot = Bot(token=os.environ.get("TOKEN"))
 
@@ -40,12 +49,12 @@ dp = Dispatcher()
 
 # Creating scheduler
 scheduler = AsyncIOScheduler(timezone="Europe/Kyiv")
+scheduler.add_job(close_session, trigger="interval", hours=4)
 
 # Creating executor copy to use functions
 executor = Executor(
     admin=os.environ.get("ADMIN"),
-    all_users={user.user_id: user for user in session.query(User).all()},
     bot=bot,
-    session=session,
+    get_session=get_session,
     scheduler=scheduler,
 )

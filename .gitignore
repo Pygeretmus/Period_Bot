@@ -3,7 +3,7 @@ __pycache__/
 
 # Environments
 .env
-env/
+venv/
 
 # Visual Studio Code folder
 .vscode/

@@ -43,5 +43,4 @@ async def emoji_state(message: types.Message) -> None:
     executor.session.execute(query)
     executor.session.commit()
 
-    await executor.remember_user(user=user)
     await emoji_keyboard(user_id=user_id)

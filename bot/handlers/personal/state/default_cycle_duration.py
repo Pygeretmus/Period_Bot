@@ -23,11 +23,20 @@ async def default_cycle_duration_state(message: types.Message, state: FSMContext
         await state.update_data(cycle_duration=int(message.text))
         await state.set_state(Default.periods_amount)
         await executor.registration_period(
-            user_id=user_id, change=True, apendix="Ти встановлюєш постійне значення!\n"
+            user_id=user_id,
+            change=True,
+            apendix=(
+                "Ти встановлюєш постійне значення!\n"
+                "Для того, щоб видалити постійне значення - введи 0.\n"
+            ),
         )
     except ValueError:
         await executor.registration_cycle(
             user_id=user_id,
-            apendix="Ти встановлюєш постійне значення!\nОтримані дані не є цифрами!\n",
+            apendix=(
+                "Ти встановлюєш постійне значення!\n"
+                "Для того, щоб видалити постійне значення - введи 0.\n"
+                "Отримані дані не є цифрами!\n"
+            ),
             change=True,
         )

@@ -21,12 +21,10 @@ async def about_callback(callback: types.CallbackQuery, state: FSMContext) -> No
     action = data[1]
 
     if action == "change":  # We need to change profile information
-        await executor.message_delete(user_id=user_id)
         await state.set_state(Change.cycle_duration)
         await executor.registration_cycle(user_id=user_id, change=True)
 
     elif action == "default":  # We need to set default information
-        await executor.message_delete(user_id=user_id)
         await state.set_state(Default.cycle_duration)
         await executor.registration_cycle(
             user_id=user_id, change=True, apendix="Ти встановлюєш постійне значення!\n"

@@ -7,8 +7,6 @@ from aiogram.enums import ParseMode
 from bot.models.models import SpecialDay
 from loader import executor
 
-now = datetime.now()
-
 day_of_the_week = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"]
 
 months_name = {
@@ -89,6 +87,7 @@ async def calendar_keyboard(user_id: int, month: int, year: int, message_id: int
     └---------------------------------------------------------┘
     '''
     """
+    now = datetime.now()
 
     user = await executor.get_user(user_id=user_id)
 

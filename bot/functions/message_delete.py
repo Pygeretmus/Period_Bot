@@ -11,3 +11,4 @@ async def message_delete(self, user_id: int) -> None:
             await self.bot.delete_message(chat_id=user_id, message_id=message)
         except exceptions.TelegramBadRequest:
             pass
+    self.bot_messages[user_id] == []

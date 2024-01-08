@@ -38,7 +38,6 @@ async def delete_period(self, user_id: int, date: date) -> None:
         await self.remember_message(user_id=user_id, message_id=answer.message_id)
 
     elif days_difference >= 0:
-        save = True
 
         # Period not first and not last -> you can't remove periods between other periods
         if days_difference > 0 and tomorrow in confirmed_period:
@@ -76,6 +75,9 @@ async def delete_period(self, user_id: int, date: date) -> None:
                         user.first_menstruation = new_first_menstruation
                         user.cycle_amount -= 1
                         user.cycle_duration -= (date - new_first_menstruation).days
+
+            elif days_difference == 0 and tomorrow in confirmed_period:
+                user.first_menstruation = tomorrow  # Change last cycle start date
 
             # Now we can change database
             self.session.delete(

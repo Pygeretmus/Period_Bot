@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from bot.models.models import User
+
 
 async def set_schedular(self):
     """
@@ -7,7 +9,7 @@ async def set_schedular(self):
     """
     today = datetime.now()
 
-    for user_id in self.all_users.keys():
-        await self.create_job(user_id=user_id, today=today)
+    for user in self.session.query(User).all():
+        await self.create_job(user_id=user.user_id, today=today)
 
     self.scheduler.start()

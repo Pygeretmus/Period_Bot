@@ -6,8 +6,6 @@ from aiogram.enums import ParseMode
 
 from loader import executor
 
-now = datetime.now()
-
 day_of_the_week = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"]
 
 months_name = {
@@ -90,6 +88,8 @@ async def registration_calendar_keyboard(
     └---------------------------------------------------------┘
     '''
     """
+    now = datetime.now()
+
     today = False
 
     # If we in current year and month
