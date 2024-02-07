@@ -44,4 +44,4 @@ async def set_period(self, user_id, date: int = False) -> None:
             user.periods_amount += len(last_cycle)  # and add them to statistics
             user.cycle_amount += 1  # increase the number of tracked cycles by 1
             user.first_menstruation = date  # and set current cycle first day
-            self.session.commit()
+        self.session.commit()
