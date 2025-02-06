@@ -33,7 +33,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-async def get_session():
+def get_session():
     return session
 
 
